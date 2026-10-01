@@ -1,0 +1,889 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathcal R}
+
+\title{Transported Romberg Extrapolation for the Arcsine Schr\"oder Linearizer\\
+\large Polynomial Composition Lifts and a Flat Infinite-Depth Limit}
+\author{Wayne Baker\\Independent Researcher}
+\date{October 1, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For an odd integer $m\ge3$, let
+\[
+S_m(z)=\sin(m\arcsin z),
+\qquad A(z)=\arcsin z,
+\]
+so that $S_m$ is an odd polynomial and $A(S_m(z))=mA(z)$ as an analytic germ at
+$0$.  Starting from $P^{(m)}_1(z)=z$, consider the finite-polynomial recursion
+\[
+P^{(m)}_{j+1}
+=P^{(m)}_j+
+\frac{mP^{(m)}_j-P^{(m)}_j\circ S_m}{m^{2j+1}-m}.
+\]
+After the change of variable $z=\sin u$, this recursion is exactly a
+Richardson--Romberg polynomial extrapolation.  It extrapolates
+$T_u(h)=\sin(hu)/h$ to $h=0$ from the geometric nodes
+$h=1,m,\ldots,m^{j-1}$.  Consequently
+\[
+P^{(m)}_j(\sin u)=\sum_{i=0}^{j-1}w^{(m)}_{j,i}\frac{\sin(m^i u)}{m^i},
+\]
+with the standard Lagrange weights at zero in the variable $h^2$.  The familiar
+jet-recovery and leading-defect formulas are therefore classical extrapolation
+consequences; in particular
+\[
+\arcsin z-P^{(m)}_j(z)
+=\frac{m^{j(j-1)}}{(2j+1)!}z^{2j+1}+O(z^{2j+3}).
+\]
+The new focus is the infinite-depth limit.  The weights converge to
+\[
+w^{(m)}_{\infty,i}
+=\frac{(-1)^i q^{i(i+1)/2}}
+{(q;q)_i(q;q)_\infty},\qquad q=m^{-2},
+\]
+which decay super-geometrically.  Hence the limiting trigonometric series
+\[
+F_m(u)=\sum_{i\ge0}w^{(m)}_{\infty,i}
+\frac{\sin(m^i u)}{m^i}
+\]
+is $C^\infty$ on $\mathbb R$, and the finite tableaux converge to it together
+with every derivative.  All moments required by polynomial extrapolation
+survive the limit, so $u-F_m(u)$ is flat at $u=0$.  The series is Hadamard-lacunary.  Its Fourier coefficients decay
+super-algebraically but not exponentially; combined with the
+functional-differential identity
+\[
+F_m(mu)=m\bigl(F_m''(u)+F_m(u)\bigr),
+\]
+this shows that $F_m$ is nowhere real analytic.  The transported function
+$G_m=F_m\circ\arcsin$ is $C^\infty$ on $(-1,1)$ and differs from $\arcsin$
+by a nonzero flat function at the origin.  The cubic case $m=3$ gives the
+scale-three specialization.
+\end{abstract}
+
+\section{Introduction}
+
+Schr\"oder's functional equation
+\[
+\Psi(f(z))=\lambda\Psi(z)
+\]
+is a classical framework for local linearization near a fixed point, going
+back to Schr\"oder's nineteenth-century work \cite{Schroeder1870}.  Richardson
+and Gaunt's deferred approach to the limit \cite{RichardsonGaunt1927}, and the
+geometric-grid formulation associated with Romberg \cite{Romberg1955}, provide
+an equally classical mechanism for cancelling successive powers in an
+asymptotic expansion; see also Joyce's survey \cite{Joyce1971} and the monograph
+of Brezinski and Redivo-Zaglia \cite{BrezinskiRedivo1991}.  A constructive
+computational treatment of Schr\"oder linearization was given by Iserles
+\cite{Iserles1993}, who also related the analysis to convergence acceleration of
+functional iteration.  For a systematic modern treatment of Richardson
+extrapolation, including geometric and near-geometric extrapolation sequences and
+Romberg-type constructions, see Sidi \cite{Sidi2003}.
+
+The present paper concerns the intersection of these two classical structures.
+For every odd integer $m\ge3$, define
+\begin{equation}
+S_m(z):=\sin(m\arcsin z).
+\label{eq:Sm}
+\end{equation}
+The multiple-angle formula makes $S_m$ an odd polynomial of degree $m$, and
+near the origin
+\begin{equation}
+A(S_m(z))=mA(z),
+\qquad A(z):=\arcsin z,
+\qquad A(0)=0,\quad A'(0)=1.
+\label{eq:schroeder}
+\end{equation}
+For $m=3$ this is the cubic sine-multiple map
+\[
+S_3(z)=3z-4z^3.
+\]
+
+Starting from $P^{(m)}_1(z)=z$, consider the recursion
+\begin{equation}
+P^{(m)}_{j+1}(z)
+=
+P^{(m)}_j(z)+
+\frac{mP^{(m)}_j(z)-P^{(m)}_j(S_m(z))}
+     {m^{2j+1}-m}.
+\label{eq:lift}
+\end{equation}
+After writing $z=\sin u$, the recursion is precisely the Romberg/Neville
+tableau obtained by extrapolating
+\[
+T_u(h):=\frac{\sin(hu)}{h}
+\]
+to $h=0$ through the nodes $h=m^i$.  Thus the finite-stage jet recovery and its
+leading error constant are not a new extrapolation principle: they are the
+standard polynomial extrapolation mechanism transported through the nonlinear
+coordinate $z=\sin u$.
+
+This identification leaves a more distinctive question.  The geometric nodes
+move away from zero, rather than toward it, and the resulting Lagrange weights
+have a super-geometric limiting profile.  Does the transported finite-polynomial
+tableau converge as its depth tends to infinity, and if it does, what is the
+limit?  We prove that the tableaux converge in $C^\infty$ in the linearizing
+variable to a periodic smooth function whose Taylor series at the origin is
+exactly $u$, but which is nowhere real analytic.  The limit is a
+Hadamard-lacunary trigonometric series, placing it in a classical family studied
+in harmonic analysis; see Zygmund~\cite{Zygmund2002}, Kahane~\cite{Kahane1964},
+and Katznelson~\cite{Katznelson2004}.  The distinctive feature here is that the
+full Taylor jet is prescribed exactly by the extrapolation moments.  After
+transport back to $z$, the limiting polynomial sequence differs from $\arcsin z$
+by a nonzero flat function.
+
+Accordingly, the contribution claimed here is not Richardson/Romberg
+extrapolation itself, nor constructive approximation of Schr\"oder linearizers,
+nor the multiple-angle identity.  It is the exact transport of the classical
+geometric extrapolation tableau through the arcsine Schr\"oder coordinate into
+a hierarchy of forward polynomial compositions, together with the explicit
+analysis of the resulting infinite-depth limit.  In particular, the limiting
+object is smooth and has the full Taylor jet of the linearizer at the fixed
+point, yet differs from it by a nonzero flat function.
+
+\section{The transported Romberg tableau}
+\label{sec:romberg}
+
+Put
+\[
+x_i:=m^{2i},\qquad i=0,1,\ldots,
+\]
+and define the Lagrange weights for evaluation at $x=0$ on the first $j$ nodes
+by
+\begin{equation}
+w^{(m)}_{j,i}
+:=
+\prod_{\substack{0\le k<j\\k\ne i}}
+\frac{x_k}{x_k-x_i},
+\qquad 0\le i<j.
+\label{eq:finiteweights}
+\end{equation}
+For fixed $u$, set
+\begin{equation}
+\mathcal T_u(x)
+:=
+\begin{cases}
+\dfrac{\sin(u\sqrt{x})}{\sqrt{x}},&x\ne0,\\[1ex]
+u,&x=0.
+\end{cases}
+\label{eq:Tux}
+\end{equation}
+Its power series
+\[
+\mathcal T_u(x)
+=
+\sum_{r=0}^{\infty}
+\frac{(-1)^r u^{2r+1}}{(2r+1)!}x^r
+\]
+shows that it is entire in $x$.
+
+\begin{theorem}[Transported Romberg representation]
+\label{thm:representation}
+For every odd $m\ge3$ and every $j\ge1$,
+\begin{equation}
+P^{(m)}_j(\sin u)
+=
+\sum_{i=0}^{j-1}w^{(m)}_{j,i}
+\frac{\sin(m^iu)}{m^i}
+=
+\sum_{i=0}^{j-1}w^{(m)}_{j,i}\,\mathcal T_u(x_i).
+\label{eq:representation}
+\end{equation}
+Equivalently, $P^{(m)}_j(\sin u)$ is the value at $x=0$ of the degree-$(j-1)$
+polynomial interpolating $\mathcal T_u(x)$ at
+$x=1,m^2,\ldots,m^{2(j-1)}$.
+In the $z$ variable,
+\begin{equation}
+P^{(m)}_j(z)
+=
+\sum_{i=0}^{j-1}w^{(m)}_{j,i}\,m^{-i}
+S_m^{\circ i}(z).
+\label{eq:iterateform}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+The interpolation formula gives the second expression in
+\eqref{eq:representation}.  Since $x_i=m^{2i}$,
+$\mathcal T_u(x_i)=\sin(m^iu)/m^i$.
+
+It remains to identify the interpolation tableau with \eqref{eq:lift}.
+Writing
+$\widehat P^{(m)}_j(u):=P^{(m)}_j(\sin u)$ and using
+$S_m(\sin u)=\sin(mu)$, the lift becomes
+\begin{equation}
+\widehat P^{(m)}_{j+1}(u)
+=
+\frac{m^{2j+1}\widehat P^{(m)}_j(u)
+      -\widehat P^{(m)}_j(mu)}{m^{2j+1}-m}
+=
+\frac{m^{2j}\widehat P^{(m)}_j(u)
+      -m^{-1}\widehat P^{(m)}_j(mu)}{m^{2j}-1}.
+\label{eq:nevillerec}
+\end{equation}
+To identify this recursion with the interpolation tableau, note first the
+scaling identity
+\begin{equation}
+\mathcal T_u(m^2x)=m^{-1}\mathcal T_{mu}(x).
+\label{eq:scalingTu}
+\end{equation}
+Hence the degree-$(j-1)$ interpolant of $\mathcal T_u$ on the shifted node
+set $x_1,\ldots,x_j$, evaluated at $0$, is
+$m^{-1}\widehat P^{(m)}_j(mu)$ whenever
+$\widehat P^{(m)}_j(u)$ is the corresponding interpolated value on
+$x_0,\ldots,x_{j-1}$.  Neville's two-block formula at $x=0$, with
+$x_0=1$ and $x_j=m^{2j}$, therefore gives
+\[
+\frac{x_j\widehat P^{(m)}_j(u)
+      -m^{-1}\widehat P^{(m)}_j(mu)}
+     {x_j-x_0}
+=
+\frac{m^{2j}\widehat P^{(m)}_j(u)
+      -m^{-1}\widehat P^{(m)}_j(mu)}
+     {m^{2j}-1},
+\]
+which is exactly \eqref{eq:nevillerec}.  Since
+$\widehat P^{(m)}_1(u)=\sin u=\mathcal T_u(1)$ for all real $u$, induction
+proves the Lagrange formula \eqref{eq:representation} for all real $u$.
+
+Finally, the polynomial identity
+$S_m^{\circ i}(\sin u)=\sin(m^iu)$ holds near $u=0$ and therefore identically
+as a polynomial in $z=\sin u$, which gives \eqref{eq:iterateform}.
+\end{proof}
+
+\begin{remark}
+The theorem makes the classical content explicit.  The finite polynomial lift
+is not merely analogous to Richardson extrapolation: after the coordinate
+change $z=\sin u$, it is exactly the same polynomial extrapolation tableau.
+The nonlinear composition structure appears when that tableau is transported
+back to $z$.
+\end{remark}
+
+\section{Finite-depth consequences}
+\label{sec:finite}
+
+The classical exactness of polynomial interpolation immediately recovers the
+finite-order results.
+
+\begin{proposition}[Moment identities]
+\label{prop:finite-moments}
+For $0\le r\le j-1$,
+\begin{equation}
+\sum_{i=0}^{j-1}w^{(m)}_{j,i}x_i^r
+=
+\begin{cases}
+1,&r=0,\\
+0,&1\le r\le j-1.
+\end{cases}
+\label{eq:finite-moments}
+\end{equation}
+Moreover,
+\begin{equation}
+\sum_{i=0}^{j-1}w^{(m)}_{j,i}x_i^j
+=(-1)^{j-1}\prod_{i=0}^{j-1}x_i
+=(-1)^{j-1}m^{j(j-1)}.
+\label{eq:leadingmoment}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The identities in \eqref{eq:finite-moments} follow from exact Lagrange
+interpolation of $1,x,\ldots,x^{j-1}$ at $x=0$.  For $x^j$, let $I_{j-1}$
+denote its interpolating polynomial.  The difference
+$x^j-I_{j-1}(x)$ is monic and vanishes at all nodes $x_i$, so
+\[
+x^j-I_{j-1}(x)=\prod_{i=0}^{j-1}(x-x_i).
+\]
+Setting $x=0$ gives \eqref{eq:leadingmoment}.
+\end{proof}
+
+\begin{theorem}[Jet recovery and exact leading defect]
+\label{thm:finite-defect}
+For every odd $m\ge3$ and every $j\ge1$,
+\begin{equation}
+P^{(m)}_j(z)
+=\arcsin z+O(z^{2j+1}),
+\label{eq:jet}
+\end{equation}
+and more precisely
+\begin{equation}
+\arcsin z-P^{(m)}_j(z)
+=
+\frac{m^{j(j-1)}}{(2j+1)!}z^{2j+1}
++O(z^{2j+3}).
+\label{eq:defectlaw}
+\end{equation}
+Also
+\begin{equation}
+\deg P^{(m)}_j=m^{j-1}.
+\label{eq:degree}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Insert the power series of $\mathcal T_u$ into \eqref{eq:representation}.
+The moment identities annihilate the terms $x^r$ for $1\le r\le j-1$, while
+\eqref{eq:leadingmoment} gives
+\[
+P^{(m)}_j(\sin u)
+=
+u-
+\frac{m^{j(j-1)}}{(2j+1)!}u^{2j+1}
++O(u^{2j+3}).
+\]
+Thus $u-P^{(m)}_j(\sin u)$ has the displayed leading coefficient.  Since
+$u=\arcsin z=z+O(z^3)$, transport back to $z$ gives
+\eqref{eq:jet}--\eqref{eq:defectlaw}.
+
+For the degree, \eqref{eq:iterateform} has a nonzero coefficient on
+$S_m^{\circ(j-1)}$, whose degree is $m^{j-1}$, while all earlier iterates have
+smaller degree.
+\end{proof}
+
+For the cubic case $m=3$, the first residual coefficients are therefore
+\[
+\frac{3^2}{5!}=\frac3{40},\qquad
+\frac{3^6}{7!}=\frac{81}{560},\qquad
+\frac{3^{12}}{9!}=\frac{6561}{4480},
+\]
+for $P_2,P_3,P_4$, respectively.  The first explicit lifts are
+\begin{align}
+P_2(z)&=z+\frac16z^3,\label{eq:P2}\\
+P_3(z)&=z+\frac16z^3+\frac3{40}z^5
+-\frac1{10}z^7+\frac2{45}z^9.\label{eq:P3}
+\end{align}
+The degree-$27$ fourth lift begins
+\begin{equation}
+P_4(z)
+=z+\frac16z^3+\frac3{40}z^5+\frac5{112}z^7
+-\frac{1807}{1260}z^9+O(z^{11}),
+\label{eq:P4}
+\end{equation}
+where the $O(z^{11})$ notation suppresses the remaining terms of the finite
+polynomial.
+
+\section{Intertwining with a geometric scale tower}
+\label{sec:tower}
+
+The same tableau can be read directly in the scale variable.  Suppose
+\begin{equation}
+N_{k+1}=mN_k,
+\qquad
+s_k=S_m(s_{k+1}),
+\label{eq:tower}
+\end{equation}
+with the points lying in a local branch on which \eqref{eq:schroeder} applies.
+Then
+\begin{equation}
+N_kA(s_k)=N_{k+1}A(s_{k+1}),
+\label{eq:invariant}
+\end{equation}
+so $N_k\arcsin s_k$ is exactly invariant along the tower.
+
+For $j\ge1$, define
+\[
+F_j(k):=N_kP^{(m)}_j(s_k)
+\]
+and the level-$j$ Richardson operator
+\begin{equation}
+(\R_jF)(k)
+:=
+\frac{m^{2j}F(k+1)-F(k)}{m^{2j}-1}.
+\label{eq:Rj}
+\end{equation}
+
+\begin{theorem}[Scale/composition intertwining identity]
+\label{thm:intertwining}
+Whenever \eqref{eq:tower} holds,
+\begin{equation}
+(\R_jF_j)(k)=F_{j+1}(k+1).
+\label{eq:intertwining}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Using $N_{k+1}=mN_k$ and $s_k=S_m(s_{k+1})$,
+\begin{align*}
+(\R_jF_j)(k)
+&=
+\frac{m^{2j}N_{k+1}P^{(m)}_j(s_{k+1})
+      -N_kP^{(m)}_j(s_k)}{m^{2j}-1}\\
+&=N_k
+\frac{m^{2j+1}P^{(m)}_j(s_{k+1})
+      -P^{(m)}_j(S_m(s_{k+1}))}{m^{2j}-1}\\
+&=mN_kP^{(m)}_{j+1}(s_{k+1})\\
+&=F_{j+1}(k+1).
+\end{align*}
+\end{proof}
+
+For $m=3$ and $j=1$, writing $G_k=N_ks_k$ gives
+\[
+\frac{9G_{k+1}-G_k}{8}
+=N_{k+1}\left(s_{k+1}+\frac{s_{k+1}^3}{6}\right),
+\]
+the familiar first scale-three correction.  The terminology
+``intertwining'' is used deliberately: the identity has an index shift and is
+not a conjugacy in the strict dynamical-systems sense.
+
+\section{Infinite-depth weights}
+\label{sec:weights}
+
+We now pass from the classical finite tableau to the infinite-depth problem.
+Put
+\begin{equation}
+q:=m^{-2}\in(0,1),
+\qquad
+(q;q)_n:=\prod_{r=1}^{n}(1-q^r),
+\qquad
+(q;q)_\infty:=\prod_{r=1}^{\infty}(1-q^r).
+\label{eq:qpoch}
+\end{equation}
+The infinite product is strictly positive.
+
+\begin{proposition}[Closed finite and limiting weights]
+\label{prop:weights}
+The Lagrange weights \eqref{eq:finiteweights} satisfy
+\begin{equation}
+w^{(m)}_{j,i}
+=
+\frac{(-1)^i q^{i(i+1)/2}}
+{(q;q)_i\,(q;q)_{j-1-i}},
+\qquad 0\le i<j.
+\label{eq:finiteqweights}
+\end{equation}
+For every fixed $i$,
+\begin{equation}
+w^{(m)}_{j,i}\longrightarrow
+w^{(m)}_{\infty,i}
+:=
+\frac{(-1)^i q^{i(i+1)/2}}
+{(q;q)_i\,(q;q)_\infty}.
+\label{eq:limitweights}
+\end{equation}
+Moreover, uniformly in $j>i$,
+\begin{equation}
+|w^{(m)}_{j,i}|
+\le
+\frac{q^{i(i+1)/2}}{(q;q)_\infty^2}.
+\label{eq:weightbound}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Since $x_i=q^{-i}$,
+\[
+w^{(m)}_{j,i}
+=\prod_{k\ne i}\frac1{1-q^{k-i}}.
+\]
+For $k<i$, put $r=i-k$ and use
+$1-q^{-r}=-q^{-r}(1-q^r)$; for $k>i$, put $r=k-i$.
+The two products give \eqref{eq:finiteqweights}.  Letting $j\to\infty$ yields
+\eqref{eq:limitweights}.  Finally
+$(q;q)_n\ge(q;q)_\infty>0$ gives \eqref{eq:weightbound}.
+\end{proof}
+
+The exponent $i(i+1)/2$ shows that the limiting weights decay faster than any
+geometric sequence.  This compensates for the increasing frequencies $m^i$.
+
+\section{The smooth flat limit}
+\label{sec:limit}
+
+Define
+\begin{equation}
+F_m(u)
+:=
+\sum_{i=0}^{\infty}w^{(m)}_{\infty,i}
+\frac{\sin(m^iu)}{m^i}.
+\label{eq:Fm}
+\end{equation}
+
+\begin{theorem}[$C^\infty$ convergence of the infinite tableau]
+\label{thm:Cinf}
+For each integer $r\ge0$, the series obtained by differentiating
+\eqref{eq:Fm} $r$ times converges absolutely and uniformly on $\mathbb R$.
+Consequently $F_m\in C^\infty(\mathbb R)$, and
+\begin{equation}
+P^{(m)}_j(\sin u)\longrightarrow F_m(u)
+\label{eq:Cinfconv}
+\end{equation}
+with uniform convergence of every derivative on $\mathbb R$.
+\end{theorem}
+
+\begin{proof}
+Extend $w^{(m)}_{j,i}$ by zero for $i\ge j$.  For fixed $i$,
+$w^{(m)}_{j,i}\to w^{(m)}_{\infty,i}$.  For $r=0$,
+\[
+\left|w^{(m)}_{j,i}\frac{\sin(m^iu)}{m^i}\right|
+\le C q^{i(i+1)/2}m^{-i}.
+\]
+For $r\ge1$, the $r$th derivative of
+$\sin(m^iu)/m^i$ has absolute value at most $m^{i(r-1)}$, and hence
+\[
+\left|w^{(m)}_{j,i}
+\frac{d^r}{du^r}\frac{\sin(m^iu)}{m^i}\right|
+\le
+C q^{i(i+1)/2}m^{i(r-1)}
+=Cm^{-i^2+(r-2)i},
+\]
+where $C=(q;q)_\infty^{-2}$.  The majorant is summable for every fixed $r$.
+The Weierstrass test and Tannery's theorem (equivalently, dominated convergence
+for these coefficient arrays) give uniform convergence of the series and of
+every differentiated series.
+\end{proof}
+
+The finite interpolation moments survive the limit.
+
+\begin{proposition}[Infinite moment identities]
+\label{prop:infinite-moments}
+For every integer $r\ge0$,
+\begin{equation}
+\sum_{i=0}^{\infty}w^{(m)}_{\infty,i}m^{2ri}
+=
+\begin{cases}
+1,&r=0,\\
+0,&r\ge1.
+\end{cases}
+\label{eq:infinite-moments}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Fix $r$.  For all $j\ge r+1$, Proposition~\ref{prop:finite-moments} gives the
+corresponding finite identity.  The bound
+\[
+|w^{(m)}_{j,i}|m^{2ri}
+\le Cq^{i(i+1)/2}q^{-ri}
+\]
+is summable in $i$.  Tannery's theorem therefore allows $j\to\infty$ and
+gives \eqref{eq:infinite-moments}.
+\end{proof}
+
+\begin{remark}[Euler's $q$-series form of the moments]
+The same identities follow directly from the classical Euler
+$q$-binomial identity
+\[
+\sum_{i=0}^{\infty}
+\frac{(-1)^i q^{i(i-1)/2}y^i}{(q;q)_i}
+=(y;q)_\infty,
+\qquad |q|<1,
+\]
+see, for example, Gasper and Rahman~\cite{GasperRahman2004}.  Indeed,
+using $m^{2r}=q^{-r}$ and \eqref{eq:limitweights},
+\[
+\sum_{i=0}^{\infty}w^{(m)}_{\infty,i}m^{2ri}
+=
+\frac{(q^{1-r};q)_\infty}{(q;q)_\infty}.
+\]
+For $r=0$ this ratio is $1$, while for every $r\ge1$ the numerator contains
+the factor $1-q^0$ and therefore vanishes.  This gives an independent
+$q$-series check of Proposition~\ref{prop:infinite-moments}.
+\end{remark}
+
+\begin{theorem}[Flat and nowhere-analytic infinite-depth limit]
+\label{thm:flat}
+The function $F_m$ satisfies
+\begin{equation}
+F_m'(0)=1,
+\qquad
+F_m^{(r)}(0)=0\quad(r\ne1).
+\label{eq:jetF}
+\end{equation}
+Hence
+\begin{equation}
+H_m(u):=u-F_m(u)
+\label{eq:Hm}
+\end{equation}
+is flat at $u=0$.
+Nevertheless $H_m$ is nonzero in every neighborhood of the origin, and $F_m$
+is nowhere real analytic on $\mathbb R$.
+\end{theorem}
+
+\begin{proof}
+Even derivatives vanish because $F_m$ is odd.  For $r\ge0$,
+\[
+F_m^{(2r+1)}(0)
+=(-1)^r
+\sum_{i=0}^{\infty}w^{(m)}_{\infty,i}m^{2ri}.
+\]
+Proposition~\ref{prop:infinite-moments} gives $F_m'(0)=1$ and zero for every
+higher odd derivative.  Thus $H_m$ is flat.
+
+To prove that the flat function is nonzero, first note from
+\eqref{eq:limitweights} that for $i\ge1$
+\begin{equation}
+w^{(m)}_{\infty,i-1}
+=-(m^{2i}-1)w^{(m)}_{\infty,i}.
+\label{eq:weightratio}
+\end{equation}
+Using the $C^2$ convergence from Theorem~\ref{thm:Cinf}, termwise
+differentiation and an index shift give
+\begin{align*}
+F_m(mu)
+&=m\sum_{i=1}^{\infty}w^{(m)}_{\infty,i-1}
+\frac{\sin(m^iu)}{m^i}\\
+&=-m\sum_{i=1}^{\infty}(m^{2i}-1)w^{(m)}_{\infty,i}
+\frac{\sin(m^iu)}{m^i}\\
+&=m\bigl(F_m''(u)+F_m(u)\bigr).
+\end{align*}
+Thus
+\begin{equation}
+F_m(mu)=m\bigl(F_m''(u)+F_m(u)\bigr).
+\label{eq:funcdiff}
+\end{equation}
+
+Suppose $H_m$ vanished on some neighborhood of $0$.  Then $F_m(u)=u$ there,
+so $F_m''(u)=0$ there.  Equation \eqref{eq:funcdiff} would then imply
+$F_m(v)=v$ on an interval $m$ times larger.  Iterating this argument gives
+$F_m(u)=u$ for every real $u$.  But $F_m$ is $2\pi$-periodic, since every term
+in \eqref{eq:Fm} is, whereas $u$ is not.  This contradiction proves that
+$H_m$ is nonzero in every neighborhood of $0$.
+
+It remains to prove nowhere real analyticity.  Write the nonzero Fourier
+coefficient of $F_m$ at frequency $n_i=m^i$ as $\widehat F_m(n_i)$.  From
+\eqref{eq:limitweights},
+\[
+|\widehat F_m(m^i)|
+=\frac{|w^{(m)}_{\infty,i}|}{2m^i}
+=\frac{m^{-i(i+2)}}{2(q;q)_i(q;q)_\infty}.
+\]
+Since $(q;q)_i\to(q;q)_\infty>0$,
+\begin{equation}
+\log |\widehat F_m(m^i)|
+=-(i^2+2i)\log m+O(1)
+=-\frac{(\log n_i)^2}{\log m}-2\log n_i+O(1).
+\label{eq:fourierdecay}
+\end{equation}
+Thus the Fourier coefficients decay faster than every algebraic power along
+the lacunary support, but they do not satisfy an exponential bound
+$O(e^{-c|n|})$ for any $c>0$.  A $2\pi$-periodic real-analytic function on
+$\mathbb R$ has exponentially decaying Fourier coefficients; see, for example,
+Katznelson~\cite[Chapter~I]{Katznelson2004}.  Hence $F_m$ is not real analytic
+on all of $\mathbb R$.
+
+Suppose now that $F_m$ were real analytic on some nonempty open interval $I$.
+Equation~\eqref{eq:funcdiff} gives, for $v\in mI$,
+\[
+F_m(v)=m\left(F_m''(v/m)+F_m(v/m)\right),
+\]
+so $F_m$ is real analytic on the dilated interval $mI$.  Iteration gives
+analyticity on $m^kI$ for every $k\ge1$.  For sufficiently large $k$, the
+length of $m^kI$ exceeds $2\pi$.  Because $F_m$ is $2\pi$-periodic, analyticity
+on such an interval propagates by translation to all of $\mathbb R$,
+contradicting the preceding Fourier-coefficient argument.  Therefore $F_m$ is
+nowhere real analytic.
+\end{proof}
+
+\begin{corollary}[Transported flat limit in the polynomial variable]
+\label{cor:zlimit}
+Define
+\begin{equation}
+G_m(z):=F_m(\arcsin z),\qquad -1\le z\le1.
+\label{eq:Gm}
+\end{equation}
+Then $G_m$ is continuous on $[-1,1]$, belongs to $C^\infty((-1,1))$, and
+\begin{equation}
+P^{(m)}_j(z)\longrightarrow G_m(z)
+\end{equation}
+uniformly on $[-1,1]$ and in $C^\infty$ on every compact subinterval of
+$(-1,1)$.  Moreover,
+\begin{equation}
+\arcsin z-G_m(z)
+\end{equation}
+is a nonzero flat function at $z=0$.  In particular, $G_m$ is not real
+analytic at the origin despite having the same Taylor series there as
+$\arcsin z$.
+\end{corollary}
+
+\begin{proof}
+Uniform convergence on $[-1,1]$ follows from Theorem~\ref{thm:Cinf} after
+putting $u=\arcsin z\in[-\pi/2,\pi/2]$.  On compact subintervals of
+$(-1,1)$, composition with the smooth map $\arcsin$ preserves convergence of
+all derivatives.  Indeed, with $H_m(u)=u-F_m(u)$ from \eqref{eq:Hm},
+\[
+\arcsin z-G_m(z)=H_m(\arcsin z).
+\]
+Flatness follows because $H_m$ is flat at $0$ and $\arcsin z$ is analytic
+with $\arcsin z=z+O(z^3)$.  If the flat difference vanished locally in $z$, then
+$F_m(u)=u$ locally after setting $z=\sin u$, contradicting
+Theorem~\ref{thm:flat}.
+\end{proof}
+
+\section{Cubic specialization and interpretation}
+
+For $m=3$ one has $q=1/9$ and
+\begin{equation}
+w^{(3)}_{\infty,i}
+=
+\frac{(-1)^i 9^{-i(i+1)/2}}
+{(1/9;1/9)_i(1/9;1/9)_\infty}.
+\label{eq:cubicweights}
+\end{equation}
+The finite polynomials are therefore
+\begin{equation}
+P_j(z)
+=
+\sum_{i=0}^{j-1}w^{(3)}_{j,i}3^{-i}S_3^{\circ i}(z),
+\qquad
+S_3(z)=3z-4z^3,
+\label{eq:cubiciterate}
+\end{equation}
+and converge on $[-1,1]$ to
+\begin{equation}
+G_3(z)
+=
+\sum_{i=0}^{\infty}w^{(3)}_{\infty,i}
+\frac{\sin(3^i\arcsin z)}{3^i}.
+\label{eq:cubiclimit}
+\end{equation}
+
+For scale, Table~\ref{tab:flatgap} records three evaluations at 50-digit precision (mpmath)
+of $H_3(u)=u-F_3(u)$.  These values are only numerical illustrations; the
+nonvanishing and flatness statements above are proved independently.
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}cc@{}}
+\toprule
+$u$ & $H_3(u)$ \\
+\midrule
+$0.1$ & $4.7381221300\times10^{-10}$ \\
+$0.6$ & $2.2871746237\times10^{-3}$ \\
+$1.5$ & $3.1540966034\times10^{-1}$ \\
+\bottomrule
+\end{tabular}
+\caption{Illustrative values of the nonzero flat discrepancy for $m=3$.}
+\label{tab:flatgap}
+\end{table}
+Every finite stage agrees with $\arcsin z$ to an increasing odd order, yet the
+infinite-depth limit is not $\arcsin z$.  This resolves the convergence question
+left open by the finite-jet theorem: the sequence converges, but the limit
+contains a nonperturbative flat discrepancy invisible to every Taylor
+coefficient at the fixed point.
+
+This phenomenon clarifies the roles of the different structures.  The
+finite-depth coefficient cancellation is classical polynomial extrapolation.
+The polynomial composition formula is its exact transport through the
+multiple-angle dynamics.  The flat nonanalytic limit appears only after taking
+the extrapolation depth to infinity on the outward geometric node set
+$1,m^2,m^4,\ldots$.
+
+\section{Scope and concluding remarks}
+
+The finite-depth statements in this paper should be read within classical
+Richardson/Romberg theory.  The weights \eqref{eq:finiteweights}, the moment
+cancellations \eqref{eq:finite-moments}, and the leading error constant
+\eqref{eq:leadingmoment} are standard consequences of polynomial
+extrapolation.  Their appearance in \eqref{eq:lift} is explained exactly by
+Theorem~\ref{thm:representation}.
+
+The additional structure comes from the multiple-angle transport.  It produces
+finite polynomials in $z$ from an extrapolation tableau in $h^2$, gives the
+iterate formula \eqref{eq:iterateform}, and makes the same operation appear as
+the scale/composition intertwining identity \eqref{eq:intertwining}.  At
+infinite depth the geometric Lagrange weights stabilize super-geometrically,
+which yields a global $C^\infty$ Hadamard-lacunary trigonometric limit.  The
+limiting moment identities force the full Taylor jet of the identity function.
+The Fourier-coefficient asymptotic \eqref{eq:fourierdecay}, together with the
+functional-differential relation \eqref{eq:funcdiff}, strengthens the local
+nonanalyticity statement to nowhere real analyticity.  Thus the limiting
+discrepancy is genuinely beyond all algebraic orders at the origin.
+
+No claim is made that Richardson extrapolation, Romberg-type geometric
+tableaux, constructive Schr\"oder approximation, Schr\"oder linearization, or
+the multiple-angle identity is new.  The paper's claim is the exact structural
+transport that turns the classical geometric extrapolation tableau into a
+forward finite-polynomial composition hierarchy for $S_m$, together with the
+analysis of its infinite-depth limit: a global smooth, nowhere-real-analytic
+lacunary trigonometric limit whose transport back to the polynomial variable
+has the complete arcsine Taylor jet at the origin but differs from $\arcsin$
+by a nonzero flat function.
+
+\begin{thebibliography}{99}
+
+\bibitem{Schroeder1870}
+E.~Schr\"oder,
+\newblock Ueber iterirte Functionen,
+\newblock \emph{Mathematische Annalen} \textbf{3} (1870), no.~2, 296--322.
+
+\bibitem{RichardsonGaunt1927}
+L.~F.~Richardson and J.~A.~Gaunt,
+\newblock The deferred approach to the limit. Part I. Single lattice. Part II.
+Interpenetrating lattices,
+\newblock \emph{Philosophical Transactions of the Royal Society of London,
+Series A} \textbf{226} (1927), 299--361.
+\newblock doi:10.1098/rsta.1927.0008.
+
+\bibitem{Romberg1955}
+W.~Romberg,
+\newblock Vereinfachte numerische Integration,
+\newblock \emph{Norske Videnskabers Selskabs Forhandlinger, Trondheim}
+\textbf{28} (1955), 30--36.
+
+\bibitem{Joyce1971}
+D.~C.~Joyce,
+\newblock Survey of extrapolation processes in numerical analysis,
+\newblock \emph{SIAM Review} \textbf{13} (1971), no.~4, 435--490.
+\newblock doi:10.1137/1013092.
+
+\bibitem{BrezinskiRedivo1991}
+C.~Brezinski and M.~Redivo-Zaglia,
+\newblock \emph{Extrapolation Methods: Theory and Practice},
+\newblock Studies in Computational Mathematics, vol.~2, North-Holland,
+Amsterdam, 1991.
+
+\bibitem{GasperRahman2004}
+G.~Gasper and M.~Rahman,
+\newblock \emph{Basic Hypergeometric Series}, 2nd ed.,
+\newblock Encyclopedia of Mathematics and its Applications, vol.~96,
+Cambridge University Press, Cambridge, 2004.
+
+\bibitem{Iserles1993}
+A.~Iserles,
+\newblock A constructive approach to the Schr\"oder equation,
+\newblock \emph{Journal of Computational and Applied Mathematics}
+\textbf{46} (1993), 301--314.
+\newblock doi:10.1016/0377-0427(93)90304-T.
+
+\bibitem{Sidi2003}
+A.~Sidi,
+\newblock \emph{Practical Extrapolation Methods: Theory and Applications},
+\newblock Cambridge University Press, Cambridge, 2003.
+\newblock doi:10.1017/CBO9780511546815.
+
+\bibitem{Zygmund2002}
+A.~Zygmund,
+\newblock \emph{Trigonometric Series}, vols.~I and II, 3rd ed.,
+\newblock Cambridge Mathematical Library, Cambridge University Press,
+Cambridge, 2002.
+
+\bibitem{Kahane1964}
+J.-P.~Kahane,
+\newblock Lacunary Taylor and Fourier series,
+\newblock \emph{Bulletin of the American Mathematical Society}
+\textbf{70} (1964), 199--213.
+\newblock doi:10.1090/S0002-9904-1964-11080-6.
+
+\bibitem{Katznelson2004}
+Y.~Katznelson,
+\newblock \emph{An Introduction to Harmonic Analysis}, 3rd ed.,
+\newblock Cambridge Mathematical Library, Cambridge University Press,
+Cambridge, 2004.
+\newblock doi:10.1017/CBO9781139165372.
+
+\end{thebibliography}
+
+\end{document}
