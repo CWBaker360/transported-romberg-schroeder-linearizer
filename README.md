@@ -75,8 +75,9 @@ A standard two-pass `pdflatex` build is sufficient. Required packages are `amsma
 
 ## Status
 
-**Publication candidate.** The mathematical development is frozen at version 7.4. Repository visibility, licensing, DOI assignment, arXiv submission, and formal public-release timing remain separate decisions.
+**Public manuscript archive.** Version 7.4 remains frozen. The repository is public and the manuscript was reported published on Zenodo on October 21, 2026. No arXiv submission or independent refereeing is asserted.
 
 ## Citation
 
-Until a persistent identifier is assigned, use the metadata in `CITATION.cff`.
+Zenodo DOI: https://doi.org/10.5281/zenodo.23536525  
+See `CITATION.cff` for machine-readable citation metadata.
